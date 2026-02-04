@@ -117,6 +117,7 @@ func NewClient(log logging.Logger, restConfig *rest.Config, argAppliers ...ArgsA
 	pc.DestDir = chartCache
 	pc.Settings = &cli.EnvSettings{}
 	pc.InsecureSkipTLSverify = args.InsecureSkipTLSVerify
+	pc.PlainHTTP = args.PlainHTTP
 
 	gc := action.NewGet(actionConfig)
 
@@ -126,12 +127,14 @@ func NewClient(log logging.Logger, restConfig *rest.Config, argAppliers ...ArgsA
 	ic.Timeout = args.Timeout
 	ic.SkipCRDs = args.SkipCRDs
 	ic.InsecureSkipTLSverify = args.InsecureSkipTLSVerify
+	ic.PlainHTTP = args.PlainHTTP
 
 	uc := action.NewUpgrade(actionConfig)
 	uc.Wait = args.Wait
 	uc.Timeout = args.Timeout
 	uc.SkipCRDs = args.SkipCRDs
 	uc.InsecureSkipTLSverify = args.InsecureSkipTLSVerify
+	uc.PlainHTTP = args.PlainHTTP
 
 	uic := action.NewUninstall(actionConfig)
 	uic.Wait = args.Wait
