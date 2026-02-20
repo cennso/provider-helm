@@ -34,6 +34,7 @@ import (
 	"helm.sh/helm/v3/pkg/registry"
 	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/client-go/rest"
+	"k8s.io/utils/ptr"
 	ktype "sigs.k8s.io/kustomize/api/types"
 
 	clusterv1beta1 "github.com/crossplane-contrib/provider-helm/apis/cluster/release/v1beta1"
@@ -135,6 +136,8 @@ func NewClient(log logging.Logger, restConfig *rest.Config, argAppliers ...ArgsA
 	uc.SkipCRDs = args.SkipCRDs
 	uc.InsecureSkipTLSverify = args.InsecureSkipTLSVerify
 	uc.PlainHTTP = args.PlainHTTP
+
+	uc.MaxHistory = int(ptr.Deref(args.MaxHistory, releaseMaxHistory))
 
 	uic := action.NewUninstall(actionConfig)
 	uic.Wait = args.Wait
@@ -343,7 +346,6 @@ func (hc *client) Install(release string, chart *chart.Chart, vals map[string]in
 func (hc *client) Upgrade(release string, chart *chart.Chart, vals map[string]interface{}, patches []ktype.Patch) (*release.Release, error) {
 	// Reset values so that source of truth for desired state is always the CR itself
 	hc.upgradeClient.ResetValues = true
-	hc.upgradeClient.MaxHistory = releaseMaxHistory
 
 	if len(patches) > 0 {
 		hc.upgradeClient.PostRenderer = &KustomizationRender{

@@ -20,7 +20,7 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/v2/apis/common/v1"
 )
@@ -97,6 +97,9 @@ type ReleaseParameters struct {
 	InsecureSkipTLSVerify bool `json:"insecureSkipTLSVerify,omitempty"`
 	// PlainHTTP uses insecure HTTP connections for the chart download
 	PlainHTTP bool `json:"plainHTTP,omitempty"`
+	// Limits the maximum number of revisions saved per release. Use 0 for no limit.
+	// +kubebuilder:validation:Minimum:=0
+	MaxHistory *int32 `json:"maxHistory,omitempty"`
 }
 
 // ReleaseObservation are the observable fields of a Release.
