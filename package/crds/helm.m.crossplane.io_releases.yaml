@@ -158,6 +158,12 @@ spec:
                     description: InsecureSkipTLSVerify skips tls certificate checks
                       for the chart download
                     type: boolean
+                  maxHistory:
+                    description: Limits the maximum number of revisions saved per
+                      release. Use 0 for no limit.
+                    format: int32
+                    minimum: 0
+                    type: integer
                   namespace:
                     description: |-
                       Namespace to install the release into.

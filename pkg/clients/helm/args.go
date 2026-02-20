@@ -16,4 +16,6 @@ type Args struct {
 	InsecureSkipTLSVerify bool
 	// PlainHTTP uses HTTP connections for the chart download
 	PlainHTTP bool
+	// Limits the maximum number of revisions saved per release. Use 0 for no limit.
+	MaxHistory *int32
 }
