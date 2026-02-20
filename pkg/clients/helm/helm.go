@@ -88,7 +88,6 @@ func resolveProviderConfigModern(ctx context.Context, crClient kclient.Client, m
 	var pcSpec kconfig.ProviderConfigSpec
 	switch pc := pcObj.(type) {
 	case *namespacedv1beta1.ProviderConfig:
-		enrichLocalSecretRefs(pc, mg)
 		pcSpec = pc.Spec
 	case *namespacedv1beta1.ClusterProviderConfig:
 		pcSpec = pc.Spec
@@ -116,10 +115,4 @@ func legacyToModernProviderConfigSpec(pc *clusterv1beta1.ProviderConfig) (*kconf
 	var mSpec kconfig.ProviderConfigSpec
 	err = json.Unmarshal(data, &mSpec)
 	return &mSpec, err
-}
-
-func enrichLocalSecretRefs(pc *namespacedv1beta1.ProviderConfig, mg resource.Managed) {
-	if pc != nil && pc.Spec.Credentials.SecretRef != nil {
-		pc.Spec.Credentials.SecretRef.Namespace = mg.GetNamespace()
-	}
 }
