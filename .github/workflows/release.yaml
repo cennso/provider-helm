@@ -1,0 +1,43 @@
+name: Release
+"on":
+  push:
+    tags: ["v*.*.*"]
+env:
+  REGISTRY_SERVER: registry.cennso.com
+  DOCKER_BUILDX_VERSION: "v0.26.1"
+  XPKG_REG_ORGS: "registry.cennso.com/public/forked/crossplane registry.cennso.com/cennso/forked/crossplane"
+jobs:
+  push-provider:
+    runs-on: [ubuntu-24.04]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: ${{ env.DOCKER_BUILDX_VERSION }}
+          install: true
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - id: get_version
+        name: Get latest release version number
+        uses: battila7/get-version-action@v2
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_SERVER }}
+          username: ${{ secrets.CUR_REGISTRY_USERNAME }}
+          password: ${{ secrets.CUR_REGISTRY_PASSWORD }}
+      - name: Build Helm Charts
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}" make build.all
+      - name: Push to registry
+        run: |-
+          XPKG_REG_ORGS="${{ env.XPKG_REG_ORGS }}" VERSION="${{ steps.get_version.outputs.version }}" OCI_REGISTRY=oci://registry.cennso.com/cennso/charts make publish
+        env:
+          # We're using docker buildx, which doesn't actually load the images it
+          # builds by default. Specifying --load does so.
+          BUILD_ARGS: "--load"
